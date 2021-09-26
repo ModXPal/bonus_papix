@@ -6,39 +6,99 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 22:01:54 by rcollas           #+#    #+#             */
-/*   Updated: 2021/09/22 00:01:23 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/09/26 17:43:48 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
 
-int	proceed_pipes(t_var *var, int end[2], int i)
+int	proceed_pipes(t_var *var, int **pipefd, int i)
 {
 	char	**cmd_args;
 
 	cmd_args = ft_split(var->av[i + 2], ' ');
-	printf("cmd = %s\n", var->cmds[i]);
-	printf("cmd_args = %s\n", *cmd_args);
 	if (i == 0)
 	{
-		printf("cmd = %s\n", var->cmds[i]);
-		printf("cmd_args = %s\n", *cmd_args);
+		//printf("cmd = %s\n", var->cmds[i]);
+		//printf("cmd_args = %s\n", *cmd_args);
 		dup2(var->file1, STDIN_FILENO);
-		dup2(end[1], STDOUT_FILENO);
-		close(end[0]);
-		close(var->file1);
-		if (execve(var->cmds[i], cmd_args, NULL) == FAIL)
+		dup2(pipefd[i + 1][1], STDOUT_FILENO);
+		//close(pipefd[i + 1][0]);
+		//close(pipefd[i + 1][1]);
+		if (close(var->file1) == -1)
+		{
+			perror("Close start failed");
 			return (0);
+		}
+		if (execve(var->cmds[i], cmd_args, NULL) == FAIL)
+		{
+			perror("Execve failed:");
+			return (0);
+		}
 	}
 	else if (i == var->size - 2)
 	{
-		printf("cmd = %s\n", var->cmds[i]);
-		printf("cmd_args = %s\n", *cmd_args);
+		//printf("cmd 2 = %s\n", var->cmds[i]);
+		//printf("cmd_args 2 = %s\n", *cmd_args);
 		dup2(var->file2, STDOUT_FILENO);
-		dup2(end[0], STDIN_FILENO);
-		close(end[1]);
-		close(var->file2);
+		dup2(pipefd[i][0], STDIN_FILENO);
+		if (close(pipefd[i][1]))
+		{
+			perror("Close start failed");
+			return (0);
+		}
+		if (close(var->file2))
+		{
+			perror("Close start failed");
+			return (0);
+		}
 		if (execve(var->cmds[i], cmd_args, NULL) == FAIL)
+		{
+			perror("Execve failed:");
+			return (0);
+		}
+	}
+	else
+	{
+		//printf("cmd sup = %s\n", var->cmds[i]);
+		//printf("cmd_args sup = %s\n", *cmd_args);
+		dup2(pipefd[i][0], STDIN_FILENO);
+		dup2(pipefd[i + 1][1], STDOUT_FILENO);
+		if (close(pipefd[i][1]))
+		{
+			perror("Close start failed");
+			return (0);
+		}
+		if (close(pipefd[i + 1][0]))
+		{
+			perror("Close start failed");
+			return (0);
+		}
+		if (execve(var->cmds[i], cmd_args, NULL) == FAIL)
+		{
+			perror("Execve failed:");
+			return (0);
+		}
+	}
+	return (1);
+}
+
+int	init_pipefd(t_var *var, int ***pipefd)
+{
+	int	i;
+
+	i = -1;
+	*pipefd = malloc(sizeof(int *) * (var->size + 1));
+	while (++i < var->size + 1)
+	{
+		(*pipefd)[i] = malloc(sizeof(int) * 2);
+		if ((*pipefd)[i] == FAIL)
+			return (0);
+	}
+	i = -1;
+	while (++i < var->size + 1)
+	{
+		if (pipe((*pipefd)[i]) == -1)
 			return (0);
 	}
 	return (1);
@@ -46,25 +106,64 @@ int	proceed_pipes(t_var *var, int end[2], int i)
 
 int	pipex(t_var *var)
 {
-	int	end[2];
+	int	**pipefd;
 	int	status;
-	int	pid;
+	pid_t	pids[var->size + 1];
 	int	i;
+	int	j;
 
 	i = -1;
-	while  (++i < var->size - 3)
+	j = -1;
+	pipefd = NULL;
+	if (init_pipefd(var, &pipefd) == FAIL)
 	{
-		pid = fork();
-		pipe(end);
-		if (pid == 0)
-		{
-			printf("i = %d\n", i);
-			proceed_pipes(var, end, i);
-		}
-		//close(end[0]);
-		//close(end[1]);
-		waitpid(pid, &status, 0);
+		perror("Pipe allocation failed");
+		return (0);
 	}
+	while  (++i < var->size - 1)
+	{
+		j = -1;
+		pids[i] = fork();
+		if (pids[i] == -1)
+		{
+			perror("Fork failed:");
+			return (0);
+		}
+		if (pids[i] == 0)
+		{
+			if (proceed_pipes(var, pipefd, i) == FAIL)
+				return (0);
+			return (1);
+		}
+		/*
+		while (++j < var->size + 1)
+		{
+			if (j != i)
+			{
+				printf("close pipefd[%d][0]\n", j);
+				if (close(pipefd[j][0]) == -1)
+				{
+					perror("Close failed 1");
+					return (0);
+				}
+			}
+			if (i + 1 != j)
+			{
+				printf("close pipefd[%d][1]\n", j);
+				if (close(pipefd[j][1]) == -1)
+				{
+					perror("Close failed 2");
+					return (0);
+				}
+			}
+		}
+		*/
+		close(pipefd[i][0]);
+		close(pipefd[i][1]);
+	}
+	i = -1;
+	while (++i < var->size)
+		waitpid(pids[i], &status, 0);
 	return (1);
 }
 
@@ -79,7 +178,7 @@ int	main(int ac, char **av, char **env)
 	}
 	var->path = get_binaries_path(env);
 	var->av = av;
-	var->size = ac;
+	var->size = ac - 2;
 	var->env = env;
 	add_slash(var);
 	get_cmds(var);

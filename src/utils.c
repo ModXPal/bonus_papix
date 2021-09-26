@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 23:47:20 by rcollas           #+#    #+#             */
-/*   Updated: 2021/09/21 23:49:29 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/09/25 07:19:39 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int	get_cmds(t_var *var)
 	j = 0;
 	k = 2;
 	var->cmds = (char **)malloc(sizeof(char *) * (var->size + 1));
-	while (k + 1 < var->size)
+	while (k < var->size + 1)
 	{
 		i = -1;
 		while (var->path[++i])
