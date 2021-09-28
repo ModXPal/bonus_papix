@@ -4,6 +4,8 @@ SRC_PATH	=	src/
 
 SRC_FILES	=	src/main.c \
 			src/utils.c \
+			src/exec.c \
+			src/free.c \
 
 LIBFT_PATH	=	libft/
 
@@ -30,7 +32,7 @@ all:			$(NAME)
 
 $(NAME):		$(SRC_OBJS)
 				@$(LIBFTMAKE)
-				@$(CC) $(SRC_OBJS) $(LIBFT_LIB) -o $(NAME)
+				@$(CC) $(CFLAGS) $(SRC_OBJS) $(LIBFT_LIB) -o $(NAME)
 				@echo "$(NAME) created"
 
 

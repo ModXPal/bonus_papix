@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 23:47:20 by rcollas           #+#    #+#             */
-/*   Updated: 2021/09/25 07:19:39 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/09/27 09:30:30 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,44 +50,43 @@ char	**get_binaries_path(char **env)
 	return (ft_split(*(env + line), ':'));
 }
 
+int	check_access(t_var *var, int k, int i)
+{
+	if (access(var->cmds[k], X_OK) == -1 && var->path[i + 1] == 0)
+		return (0);
+	else if (access(var->cmds[k], X_OK) == 0)
+		return (1);
+	return (-1);
+}
+
 int	get_cmds(t_var *var)
 {
-	int	i;
-	int	j;
-	int	k;
+	int		i;
+	int		k;
 	char	**cmd_args;
 
-	j = 0;
-	k = 2;
+	k = -1;
 	var->cmds = (char **)malloc(sizeof(char *) * (var->size + 1));
-	while (k < var->size + 1)
+	while (++k < var->size - 1)
 	{
 		i = -1;
 		while (var->path[++i])
 		{
-			cmd_args = ft_split(var->av[k], ' ');
-			var->cmds[j] = ft_strjoin(var->path[i], *cmd_args);
-			if (access(var->cmds[j], X_OK) == 0)
+			cmd_args = ft_split(var->av[k + 2], ' ');
+			var->cmds[k] = ft_strjoin(var->path[i], *cmd_args);
+			if (check_access(var, k, i) == SUCCESS)
 				break ;
-			if (var->path[i + 1])
-				free(var->cmds[j]);
+			else if (check_access(var, k, i) == FAIL)
+			{
+				write (2, var->av[k + 2], ft_strlen(var->av[k + 2]));
+				write (2, ": command not found\n", 21);
+				return (free_arg(cmd_args));
+			}
+			free(var->cmds[k]);
 			free_arg(cmd_args);
 		}
 		free_arg(cmd_args);
-		j++;
-		k++;
 	}
-	var->cmds[j] = NULL;
+	var->cmds[k] = NULL;
 	return (1);
-}
-
-int	free_arg(char **cmd_args)
-{
-	int	i;
-
-	i = -1;
-	while (cmd_args[++i])
-		free(cmd_args[i]);
-	free(cmd_args);
-	return (0);
 }
