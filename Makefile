@@ -6,6 +6,8 @@ SRC_FILES	=	src/main.c \
 			src/utils.c \
 			src/exec.c \
 			src/free.c \
+			src/get_path.c \
+			src/init.c \
 
 LIBFT_PATH	=	libft/
 
