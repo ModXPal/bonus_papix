@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 22:07:09 by rcollas           #+#    #+#             */
-/*   Updated: 2021/09/30 14:20:47 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/10/09 15:47:32 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct s_var {
 	int		file1;
 	int		file2;
 	int		size;
+	int		ac;
 	char	**path;
 	char	**av;
 	char	**cmds;
@@ -43,6 +44,6 @@ int		free_pipes(int **pipefd, t_var *var);
 int		check_cmds(t_var *var, char **cmd_args, int i, int k);
 int		close_pipes(int **pipefd, t_var *var);
 int		init_pipefd(t_var *var, int ***pipefd);
-int		init_pid(pid_t **pids, t_var *);
+int		init_pid(pid_t **pids, t_var *var);
 
 #endif

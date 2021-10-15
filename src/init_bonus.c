@@ -6,7 +6,7 @@
 /*   By: rcollas <rcollas@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:17:08 by rcollas           #+#    #+#             */
-/*   Updated: 2021/10/09 15:47:53 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/10/08 18:04:40 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,5 +51,6 @@ void	init_var(t_var *var, char **av, char **env, int ac)
 	var->av = av;
 	var->size = ac - 2;
 	var->env = env;
-	var->ac = ac;
+	var->file1 = open(av[1], O_RDONLY);
+	var->file2 = open(av[ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 }
