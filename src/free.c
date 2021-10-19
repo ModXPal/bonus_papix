@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/27 08:14:11 by rcollas           #+#    #+#             */
-/*   Updated: 2021/09/27 08:42:26 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/10/18 14:36:05 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	free_pipes(int **pipefd, t_var *var)
 	int	i;
 
 	i = -1;
-	while (++i < var->size + 1)
+	while (++i < var->size)
 		free(pipefd[i]);
 	free(pipefd);
 	return (0);
