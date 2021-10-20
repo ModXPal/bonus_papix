@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 22:01:54 by rcollas           #+#    #+#             */
-/*   Updated: 2021/10/20 10:44:06 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/10/20 10:53:41 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/pipex.h"
+#include "../include/pipex_bonus.h"
 
 int	pipex(t_var *var)
 {
@@ -39,7 +39,7 @@ int	main(int ac, char **av, char **env)
 {
 	t_var	var[1];
 
-	if (ac != 5)
+	if (ac < 5)
 	{
 		ft_putstr_fd("Check arguments\n", 2);
 		return (0);
