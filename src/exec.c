@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/26 18:09:22 by rcollas           #+#    #+#             */
-/*   Updated: 2021/10/20 10:33:16 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/11/03 12:13:27 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ int	infile_cmd(t_var *var, int **pipefd, int i)
 	dup2(var->file1, STDIN_FILENO);
 	dup2(pipefd[i + 1][1], STDOUT_FILENO);
 	close_pipes(pipefd, var);
-	close(var->file1);
 	if (execve(var->cmds, cmd_args, NULL) == FAIL)
 	{
 		perror("Execve failed:");
@@ -74,19 +73,21 @@ void	proceed_pipes(t_var *var, int **pipefd, int i)
 {
 	if (i == 0)
 	{
-		if (var->file1 < 0)
-			return (perror(var->av[1]));
+		if (open_files(var, i) == FAIL)
+			return ;
 		if (get_cmds(var, i) == FAIL)
 			return ;
 		infile_cmd(var, pipefd, i);
+		close(var->file1);
 	}
 	else if (i == var->size - 2)
 	{
-		if (var->file2 < 0)
-			return (perror(var->av[var->size + 1]));
+		if (open_files(var, i) == FAIL)
+			return ;
 		if (get_cmds(var, i) == FAIL)
 			return ;
 		outfile_cmd(var, pipefd, i);
+		close(var->file2);
 	}
 	else
 	{
@@ -102,8 +103,6 @@ int	exec(t_var *var, int **pipefd, pid_t *pids)
 	int		status;
 
 	i = -1;
-	var->file1 = open(var->av[1], O_RDONLY);
-	var->file2 = open(var->av[var->ac - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	while (++i < var->size - 1)
 	{
 		pids[i] = fork();

@@ -18,6 +18,10 @@ BONUS_FILES	=	src/bonus/main_bonus.c \
 			src/bonus/get_path_bonus.c \
 			src/bonus/init_bonus.c \
 
+INCLUDE		=	include/pipex.h
+
+INCLUDE_BONUS	=	include/pipex_bonus.h
+
 LIBFT_PATH	=	libft/
 
 LIBFT_LIB	=	libft/libft.a
@@ -45,12 +49,12 @@ all:			$(NAME)
 
 bonus:			$(BONUS)
 
-$(NAME):		$(SRC_OBJS)
+$(NAME):		$(SRC_OBJS) $(INCLUDE)
 				@$(LIBFTMAKE)
 				@$(CC) $(CFLAGS) $(SRC_OBJS) $(LIBFT_LIB) -o $(NAME)
 				@echo "$(NAME) created"
 
-$(BONUS):		$(BONUS_OBJS)
+$(BONUS):		$(BONUS_OBJS) $(INCLUDE_BONUS)
 				@$(LIBFTMAKE)
 				@$(CC) $(CFLAGS) $(BONUS_OBJS) $(LIBFT_LIB) -o $(BONUS)
 				@echo "$(BONUS) created"
@@ -69,4 +73,4 @@ fclean:			clean
 
 re:			fclean all
 
-.PHONY:			all clean fclean re lmake bonus
+.PHONY:			all clean fclean re bonus

@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/21 22:07:09 by rcollas           #+#    #+#             */
-/*   Updated: 2021/10/18 15:28:15 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/11/03 12:20:10 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,6 @@ int		check_cmds(t_var *var, char **cmd_args, int i, int k);
 int		close_pipes(int **pipefd, t_var *var);
 int		init_pipefd(t_var *var, int ***pipefd);
 int		init_pid(pid_t **pids, t_var *var);
+int		open_files(t_var *var, int i);
 
 #endif

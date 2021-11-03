@@ -6,7 +6,7 @@
 /*   By: rcollas <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/20 23:47:20 by rcollas           #+#    #+#             */
-/*   Updated: 2021/10/20 10:49:39 by rcollas          ###   ########.fr       */
+/*   Updated: 2021/11/03 12:14:16 by rcollas          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,29 @@ int	cmd_not_found(t_var *var, int k, char **cmd_args)
 	return (free_arg(cmd_args));
 }
 
+int	no_such_file(t_var *var, int k, char **cmd_args)
+{
+	write (2, var->av[k + 2], ft_strlen(var->av[k + 2]));
+	write (2, ": No such file or directory\n", 28);
+	free(var->cmds);
+	return (free_arg(cmd_args));
+}
+
 int	get_cmds(t_var *var, int k)
 {
 	int		i;
 	char	**cmd_args;
 
 	i = -1;
+	if (var->av[k + 2][0] == '/')
+	{
+		cmd_args = ft_split(var->av[k + 2], ' ');
+		var->cmds = *cmd_args;
+		if (check_access(var, -1) == SUCCESS)
+			return (free_arg(cmd_args) + 1);
+		else
+			return (no_such_file(var, k, cmd_args));
+	}
 	while (var->path[++i])
 	{
 		cmd_args = ft_split(var->av[k + 2], ' ');
@@ -69,6 +86,5 @@ int	get_cmds(t_var *var, int k)
 		free(var->cmds);
 		free_arg(cmd_args);
 	}
-	free_arg(cmd_args);
-	return (1);
+	return (free_arg(cmd_args) + 1);
 }
